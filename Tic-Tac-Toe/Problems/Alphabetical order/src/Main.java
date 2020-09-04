@@ -9,8 +9,8 @@ class Main {
 
         while (scan.hasNext()) {
             arr[1] = scan.next();
-            if(!areOrdered(arr[0], arr[1])){
-                result =false;
+            if (!areOrdered(arr[0], arr[1])) {
+                result = false;
                 break;
             }
             arr[0] = arr[1];
@@ -20,7 +20,7 @@ class Main {
     }
 
     public static boolean areOrdered(String left, String right) {
-        if(right.length() < left.length()){
+        if (right.length() < left.length()) {
             return false;
         }
 
