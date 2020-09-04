@@ -12,8 +12,8 @@ class Main {
         }
         var n = scan.nextInt();
 
-        for (var i : arr){
-            if(i > n) {
+        for (var i : arr) {
+            if (i > n) {
                 sum += i;
             }
         }
