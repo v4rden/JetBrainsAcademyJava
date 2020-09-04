@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int[] numbers; // initialize the array
+        int[] numbers = {12, 17, 8, 101, 33};
 
         System.out.println(Arrays.toString(numbers));
     }
