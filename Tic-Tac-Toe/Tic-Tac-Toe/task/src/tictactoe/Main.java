@@ -5,12 +5,12 @@ import java.util.Scanner;
 public class Main {
     public static final char X = 'X';
     public static final char O = 'O';
-    public static final char empty = '_';
+    public static final char EMPTY = '_';
 
     public static void main(String[] args) {
         var side = 3;
         var scan = new Scanner(System.in);
-        scan.useDelimiter(Res.stringEmpty);
+        scan.useDelimiter(Res.STRING_EMPTY);
         var arr = new char[3][3];
 
         for (int i = 0; i < side; i++) {
@@ -25,7 +25,7 @@ public class Main {
     }
 
     public static String getLine(char p1, char p2, char p3) {
-        return String.format(Res.rowFormat, p1, p2, p3);
+        return String.format(Res.ROW_FORMAT, p1, p2, p3);
     }
 
     public static String getWin(char[][] arr, int side) {
@@ -37,7 +37,7 @@ public class Main {
         var diff = xCount - oCount;
 
         if (diff < -1 || diff > 1) {
-            return Res.impossibleMsg;
+            return Res.IMPOSSIBLE_MSG;
         }
 
         for (var i = 0; i < side; i++) {
@@ -77,20 +77,20 @@ public class Main {
         }
 
         if (xWin && oWin) {
-            return Res.impossibleMsg;
+            return Res.IMPOSSIBLE_MSG;
         }
         if (xWin) {
-            return Res.xWinsMsg;
+            return Res.X_WINS_MSG;
         }
         if (oWin) {
-            return Res.oWinsMsg;
+            return Res.O_WINS_MSG;
         }
         var hasEmpty = hasEmpty(arr, side);
         if (hasEmpty) {
-            return Res.notFinishedMsg;
+            return Res.NOT_FINISHED;
         }
 
-        return Res.drawMsg;
+        return Res.DRAW_MSG;
     }
 
     enum State {
@@ -147,7 +147,7 @@ public class Main {
         var result = false;
         for (var i = 0; i < side; i++) {
             for (var j = 0; j < side; j++) {
-                if (arr[i][j] == empty) {
+                if (arr[i][j] == EMPTY) {
                     result = true;
                     break;
                 }
@@ -179,21 +179,21 @@ public class Main {
     }
 
     public static void printOut(char[][] arr) {
-        System.out.println(Res.upperBorder);
+        System.out.println(Res.UPPER_BORDER);
         System.out.println(getLine(arr[0][0], arr[0][1], arr[0][2]));
         System.out.println(getLine(arr[1][0], arr[1][1], arr[1][2]));
         System.out.println(getLine(arr[2][0], arr[2][1], arr[2][2]));
-        System.out.println(Res.upperBorder);
+        System.out.println(Res.UPPER_BORDER);
     }
 
     private static class Res {
-        private static final String upperBorder = "---------";
-        private static final String impossibleMsg = "Impossible";
-        private static final String xWinsMsg = "X wins";
-        private static final String oWinsMsg = "O wins";
-        private static final String notFinishedMsg = "Game not finished";
-        private static final String drawMsg = "Draw";
-        private static final String stringEmpty = "";
-        private static final String rowFormat = "| %c %c %c |";
+        private static final String UPPER_BORDER = "---------";
+        private static final String IMPOSSIBLE_MSG = "Impossible";
+        private static final String X_WINS_MSG = "X wins";
+        private static final String O_WINS_MSG = "O wins";
+        private static final String NOT_FINISHED = "Game not finished";
+        private static final String DRAW_MSG = "Draw";
+        private static final String STRING_EMPTY = "";
+        private static final String ROW_FORMAT = "| %c %c %c |";
     }
 }
