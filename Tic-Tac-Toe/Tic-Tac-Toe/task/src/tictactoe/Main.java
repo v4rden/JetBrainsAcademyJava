@@ -93,12 +93,6 @@ public class Main {
         return Res.DRAW_MSG;
     }
 
-    enum State {
-        XWIN,
-        OWIN,
-        INCOMPLETE
-    }
-
     public static State getRowState(int row, char[][] arr, int side) {
         char c = arr[row][0];
         for (var i = 1; i < side; i++) {
@@ -188,6 +182,12 @@ public class Main {
 
     public static void printOut(String string) {
         System.out.println(string);
+    }
+
+    enum State {
+        XWIN,
+        OWIN,
+        INCOMPLETE
     }
 
     private static class Res {
