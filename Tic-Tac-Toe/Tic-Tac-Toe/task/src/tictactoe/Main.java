@@ -21,7 +21,7 @@ public class Main {
 
         printoutArray(arr);
 
-        System.out.println(getWin(arr, SIDE));
+        printOut(getWin(arr, SIDE));
     }
 
     public static String getLine(char p1, char p2, char p3) {
