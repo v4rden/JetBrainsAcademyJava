@@ -3,19 +3,14 @@ package tictactoe;
 import java.util.Scanner;
 
 public class Main {
-    private static final String upperBorder = "---------";
-    private static final String impossibleMsg = "Impossible";
-    private static final String xWinsMsg = "X wins";
-    private static final String oWinsMsg = "O wins";
-    private static final String notFinishedMsg = "Game not finished";
-    private static final String drawMsg = "Draw";
-    private static final String stringEmpty = "";
-    private static final String rowFormat = "| %c %c %c |";
+    public static final char X = 'X';
+    public static final char O = 'O';
+    public static final char empty = '_';
 
     public static void main(String[] args) {
         var side = 3;
         var scan = new Scanner(System.in);
-        scan.useDelimiter(stringEmpty);
+        scan.useDelimiter(Res.stringEmpty);
         var arr = new char[3][3];
 
         for (int i = 0; i < side; i++) {
@@ -30,19 +25,19 @@ public class Main {
     }
 
     public static String getLine(char p1, char p2, char p3) {
-        return String.format(rowFormat, p1, p2, p3);
+        return String.format(Res.rowFormat, p1, p2, p3);
     }
 
     public static String getWin(char[][] arr, int side) {
         var xWin = false;
         var oWin = false;
 
-        var xCount = getCount(arr, side, 'X');
-        var oCount = getCount(arr, side, 'O');
+        var xCount = getCount(arr, side, X);
+        var oCount = getCount(arr, side, O);
         var diff = xCount - oCount;
 
         if (diff < -1 || diff > 1) {
-            return impossibleMsg;
+            return Res.impossibleMsg;
         }
 
         for (var i = 0; i < side; i++) {
@@ -82,20 +77,20 @@ public class Main {
         }
 
         if (xWin && oWin) {
-            return impossibleMsg;
+            return Res.impossibleMsg;
         }
         if (xWin) {
-            return xWinsMsg;
+            return Res.xWinsMsg;
         }
         if (oWin) {
-            return oWinsMsg;
+            return Res.oWinsMsg;
         }
         var hasEmpty = hasEmpty(arr, side);
         if (hasEmpty) {
-            return notFinishedMsg;
+            return Res.notFinishedMsg;
         }
 
-        return drawMsg;
+        return Res.drawMsg;
     }
 
     enum State {
@@ -152,7 +147,7 @@ public class Main {
         var result = false;
         for (var i = 0; i < side; i++) {
             for (var j = 0; j < side; j++) {
-                if (arr[i][j] == '_') {
+                if (arr[i][j] == empty) {
                     result = true;
                     break;
                 }
@@ -174,20 +169,31 @@ public class Main {
     }
 
     public static State toSate(char c) {
-        if (c == 'X') {
+        if (c == X) {
             return State.XWIN;
         }
-        if (c == 'O') {
+        if (c == O) {
             return State.OWIN;
         }
         return State.INCOMPLETE;
     }
 
     public static void printOut(char[][] arr) {
-        System.out.println(upperBorder);
+        System.out.println(Res.upperBorder);
         System.out.println(getLine(arr[0][0], arr[0][1], arr[0][2]));
         System.out.println(getLine(arr[1][0], arr[1][1], arr[1][2]));
         System.out.println(getLine(arr[2][0], arr[2][1], arr[2][2]));
-        System.out.println(upperBorder);
+        System.out.println(Res.upperBorder);
+    }
+
+    private static class Res {
+        private static final String upperBorder = "---------";
+        private static final String impossibleMsg = "Impossible";
+        private static final String xWinsMsg = "X wins";
+        private static final String oWinsMsg = "O wins";
+        private static final String notFinishedMsg = "Game not finished";
+        private static final String drawMsg = "Draw";
+        private static final String stringEmpty = "";
+        private static final String rowFormat = "| %c %c %c |";
     }
 }
