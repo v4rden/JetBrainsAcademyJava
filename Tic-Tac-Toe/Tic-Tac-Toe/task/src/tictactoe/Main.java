@@ -6,22 +6,22 @@ public class Main {
     public static final char X = 'X';
     public static final char O = 'O';
     public static final char EMPTY = '_';
+    public static final int SIDE = 3;
 
     public static void main(String[] args) {
-        var side = 3;
         var scan = new Scanner(System.in);
         scan.useDelimiter(Res.STRING_EMPTY);
-        var arr = new char[3][3];
+        var arr = new char[SIDE][SIDE];
 
-        for (int i = 0; i < side; i++) {
-            for (int j = 0; j < side; j++) {
+        for (int i = 0; i < SIDE; i++) {
+            for (int j = 0; j < SIDE; j++) {
                 arr[i][j] = scan.next().charAt(0);
             }
         }
 
-        printOut(arr);
+        printoutArray(arr);
 
-        System.out.println(getWin(arr, side));
+        System.out.println(getWin(arr, SIDE));
     }
 
     public static String getLine(char p1, char p2, char p3) {
@@ -178,12 +178,16 @@ public class Main {
         return State.INCOMPLETE;
     }
 
-    public static void printOut(char[][] arr) {
-        System.out.println(Res.UPPER_BORDER);
-        System.out.println(getLine(arr[0][0], arr[0][1], arr[0][2]));
-        System.out.println(getLine(arr[1][0], arr[1][1], arr[1][2]));
-        System.out.println(getLine(arr[2][0], arr[2][1], arr[2][2]));
-        System.out.println(Res.UPPER_BORDER);
+    public static void printoutArray(char[][] arr) {
+        printOut(Res.UPPER_BORDER);
+        printOut(getLine(arr[0][0], arr[0][1], arr[0][2]));
+        printOut(getLine(arr[1][0], arr[1][1], arr[1][2]));
+        printOut(getLine(arr[2][0], arr[2][1], arr[2][2]));
+        printOut(Res.UPPER_BORDER);
+    }
+
+    public static void printOut(String string) {
+        System.out.println(string);
     }
 
     private static class Res {
