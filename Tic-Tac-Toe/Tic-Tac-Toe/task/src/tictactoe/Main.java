@@ -12,14 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
-        var init = scan.nextLine();
-        var index = 0;
-        for (int i = 0; i < SIDE; i++) {
-            for (int j = 0; j < SIDE; j++) {
-                WORLD[i][j] = init.charAt(index);
-                index++;
-            }
-        }
+        readWorld(scan);
 
         printoutArray();
 
@@ -75,7 +68,7 @@ public class Main {
         WORLD[i][j] = input;
     }
 
-    public static String getWin(int side) {
+    public static String getWorldState(int side) {
         var xWin = false;
         var oWin = false;
 
@@ -224,6 +217,17 @@ public class Main {
         printOut(getLine(WORLD[1][0], WORLD[1][1], WORLD[1][2]));
         printOut(getLine(WORLD[2][0], WORLD[2][1], WORLD[2][2]));
         printOut(Res.UPPER_BORDER);
+    }
+
+    public static void readWorld(Scanner scan) {
+        var init = scan.nextLine();
+        var index = 0;
+        for (int i = 0; i < SIDE; i++) {
+            for (int j = 0; j < SIDE; j++) {
+                WORLD[i][j] = init.charAt(index);
+                index++;
+            }
+        }
     }
 
     public static void printOut(String string) {
