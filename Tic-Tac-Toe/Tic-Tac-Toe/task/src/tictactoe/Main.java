@@ -7,11 +7,11 @@ public class Main {
     public static final char O = 'O';
     public static final char EMPTY = '_';
     public static final int SIDE = 3;
+    public static int[][] WORLD = new int[SIDE][SIDE];
     public static final int[] funnyCrunch = {2, 1, 0};
 
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
-        //scan.useDelimiter(Res.STRING_EMPTY);
         var init = scan.nextLine();
         var arr = new char[SIDE][SIDE];
         var index = 0;
