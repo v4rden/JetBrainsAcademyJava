@@ -9,51 +9,67 @@ public class Main {
     public static final int SIDE = 3;
     public static char[][] WORLD = new char[SIDE][SIDE];
     public static final int[] funnyCrunch = {2, 1, 0};
+    public static char TURN = X;
 
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
-        readWorld(scan);
-
+        initWorld();
         printoutArray();
 
-        int jInput = 0;
-        int iInput = 0;
+        while (WorldState.INCOMPLETE) {
+            readOneMove(scan);
+            changeWorld();
+            printoutArray();
+            updateWorldState();
+            passTurn();
+        }
+
+        printOut(WorldState.getStateMessage());
+    }
+
+    public static void readOneMove(Scanner scan) {
         var readingInput = true;
 
         while (readingInput && scan.hasNext()) {
-            var input = scan.nextLine();
-            var i = input.charAt(0);
-            var j = input.charAt(2);
-            if (!Character.isDigit(i) ||
-                    !Character.isDigit(j)) {
-                printOut(Res.NUM_ONLY_MSG);
-                continue;
-            }
-            iInput = Character.getNumericValue(i);
-            jInput = Character.getNumericValue(j);
-
-            if (iInput < 1 || jInput < 1 ||
-                    iInput > 3 || jInput > 3) {
-                printOut(Res.OUT_OF_RANGE);
-                continue;
-            }
-            iInput--;
-            jInput--;
-
-            int iTr = funnyCrunch[jInput];
-            int jTr = iInput;
-            if (!isVacant(iTr, jTr)) {
-                printOut(Res.OCCUPIED_MSG);
-                continue;
-            }
-            iInput = iTr;
-            jInput = jTr;
-            readingInput = false;
+            var success = tryReadMove(scan);
+            readingInput = !success;
         }
-        changeWorld(iInput, jInput, X);
-        printoutArray();
+    }
 
-        //printOut(getWin(arr, SIDE));
+    private static Boolean tryReadMove(Scanner scan) {
+        var input = scan.nextLine();
+
+        var iChar = input.charAt(0);
+        var jChar = input.charAt(2);
+
+        if (!Character.isDigit(iChar) ||
+                !Character.isDigit(jChar)) {
+            printOut(Res.NUM_ONLY_MSG);
+            return false;
+        }
+        var iInput = Character.getNumericValue(iChar);
+        var jInput = Character.getNumericValue(jChar);
+
+        if (iInput < 1 || jInput < 1 ||
+                iInput > 3 || jInput > 3) {
+            printOut(Res.OUT_OF_RANGE);
+            return false;
+        }
+
+        iInput--;
+        jInput--;
+
+        int iSwap = funnyCrunch[jInput];
+        int jSwap = iInput;
+
+        if (!isVacant(iSwap, jSwap)) {
+            printOut(Res.OCCUPIED_MSG);
+            return false;
+        }
+        InputPos.I = iSwap;
+        InputPos.J = jSwap;
+
+        return true;
     }
 
     public static boolean isVacant(int i, int j) {
@@ -64,105 +80,68 @@ public class Main {
         return String.format(Res.ROW_FORMAT, p1, p2, p3);
     }
 
-    public static void changeWorld(int i, int j, char input) {
-        WORLD[i][j] = input;
+    public static void changeWorld() {
+        WORLD[InputPos.I][InputPos.J] = TURN;
     }
 
-    public static String getWorldState(int side) {
-        var xWin = false;
-        var oWin = false;
-
+    public static void updateWorldState() {
         var xCount = getCount(X);
         var oCount = getCount(O);
         var diff = xCount - oCount;
 
         if (diff < -1 || diff > 1) {
-            return Res.IMPOSSIBLE_MSG;
+            WorldState.IMPOSSIBLE = true;
+            WorldState.INCOMPLETE = false;
+            return;
         }
 
-        for (var i = 0; i < side; i++) {
-            var result = getRowState(i);
-            if (result == State.XWIN) {
-                xWin = true;
-            }
-            if (result == State.OWIN) {
-                oWin = true;
-            }
+        for (var i = 0; i < SIDE; i++) {
+           getRowState(i);
         }
 
-        for (var i = 0; i < side; i++) {
-            var result = getColumnSate(i);
-            if (result == State.XWIN) {
-                xWin = true;
-            }
-            if (result == State.OWIN) {
-                oWin = true;
-            }
+        for (var i = 0; i < SIDE; i++) {
+            getColumnSate(i);
         }
 
-        var leftAxisState = getLeftAxisState();
-        var rightAxisState = getRightAxisState();
+        getLeftAxisState();
+        getRightAxisState();
 
-        if (leftAxisState == State.XWIN) {
-            xWin = true;
+        if(!hasEmpty()){
+            WorldState.INCOMPLETE = false;
         }
-        if (leftAxisState == State.OWIN) {
-            oWin = true;
-        }
-        if (rightAxisState == State.XWIN) {
-            xWin = true;
-        }
-        if (rightAxisState == State.OWIN) {
-            oWin = true;
-        }
-
-        if (xWin && oWin) {
-            return Res.IMPOSSIBLE_MSG;
-        }
-        if (xWin) {
-            return Res.X_WINS_MSG;
-        }
-        if (oWin) {
-            return Res.O_WINS_MSG;
-        }
-        if (hasEmpty()) {
-            return Res.NOT_FINISHED;
-        }
-
-        return Res.DRAW_MSG;
     }
 
-    public static State getRowState(int row) {
+    public static void getRowState(int row) {
         char c = WORLD[row][0];
         for (var i = 1; i < SIDE; i++) {
             if (c != WORLD[row][i]) {
-                return State.INCOMPLETE;
+                return;
             }
         }
-        return toSate(c);
+        toSate(c);
     }
 
-    public static State getColumnSate(int column) {
+    public static void getColumnSate(int column) {
         char c = WORLD[0][column];
         for (var i = 1; i < SIDE; i++) {
             if (c != WORLD[i][column]) {
-                return State.INCOMPLETE;
+                return;
             }
         }
-        return toSate(c);
+        toSate(c);
     }
 
-    public static State getLeftAxisState() {
+    public static void getLeftAxisState() {
         char c = WORLD[0][0];
         for (var i = 1; i < SIDE; i++) {
             if (c != WORLD[i][i]) {
-                return State.INCOMPLETE;
+                return;
             }
         }
-        return toSate(c);
+        toSate(c);
     }
 
-    public static State getRightAxisState() {
+    public static void getRightAxisState() {
         char c = WORLD[0][SIDE - 1];
         for (
                 int i = 1, j = SIDE - 2;
@@ -170,10 +149,10 @@ public class Main {
                 i++, j--
         ) {
             if (c != WORLD[i][j]) {
-                return State.INCOMPLETE;
+                return;
             }
         }
-        return toSate(c);
+        toSate(c);
     }
 
     public static boolean hasEmpty() {
@@ -201,14 +180,19 @@ public class Main {
         return counter;
     }
 
-    public static State toSate(char c) {
+    public static void toSate(char c) {
         if (c == X) {
-            return State.XWIN;
+            WorldState.X_WON = true;
+            WorldState.INCOMPLETE = false;
         }
         if (c == O) {
-            return State.OWIN;
+            WorldState.O_WON = true;
+            WorldState.INCOMPLETE = false;
         }
-        return State.INCOMPLETE;
+    }
+
+    public static void passTurn() {
+        TURN = TURN == X ? O : X;
     }
 
     public static void printoutArray() {
@@ -219,13 +203,10 @@ public class Main {
         printOut(Res.UPPER_BORDER);
     }
 
-    public static void readWorld(Scanner scan) {
-        var init = scan.nextLine();
-        var index = 0;
+    public static void initWorld() {
         for (int i = 0; i < SIDE; i++) {
             for (int j = 0; j < SIDE; j++) {
-                WORLD[i][j] = init.charAt(index);
-                index++;
+                WORLD[i][j] = EMPTY;
             }
         }
     }
@@ -234,10 +215,33 @@ public class Main {
         System.out.println(string);
     }
 
-    enum State {
-        XWIN,
-        OWIN,
-        INCOMPLETE
+    private static class InputPos {
+        public static int I;
+        public static int J;
+    }
+
+    private static class WorldState {
+        public static Boolean X_WON = false;
+        public static Boolean O_WON = false;
+        public static Boolean INCOMPLETE = true;
+        public static Boolean IMPOSSIBLE = false;
+
+        public static String getStateMessage(){
+            if (X_WON && O_WON) {
+                return Res.IMPOSSIBLE_MSG;
+            }
+            if (X_WON) {
+                return Res.X_WINS_MSG;
+            }
+            if (O_WON) {
+                return Res.O_WINS_MSG;
+            }
+//            if (hasEmpty()) {
+//                return Res.NOT_FINISHED;
+//            }
+
+            return Res.DRAW_MSG;
+        }
     }
 
     private static class Res {
