@@ -236,10 +236,6 @@ public class Main {
             if (O_WON) {
                 return Res.O_WINS_MSG;
             }
-//            if (hasEmpty()) {
-//                return Res.NOT_FINISHED;
-//            }
-
             return Res.DRAW_MSG;
         }
     }
@@ -249,7 +245,6 @@ public class Main {
         private static final String IMPOSSIBLE_MSG = "Impossible";
         private static final String X_WINS_MSG = "X wins";
         private static final String O_WINS_MSG = "O wins";
-        private static final String NOT_FINISHED = "Game not finished";
         private static final String DRAW_MSG = "Draw";
         private static final String ROW_FORMAT = "| %c %c %c |";
         private static final String NUM_ONLY_MSG = "You should enter numbers!";
