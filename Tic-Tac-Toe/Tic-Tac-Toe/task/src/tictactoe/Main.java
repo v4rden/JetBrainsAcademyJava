@@ -7,25 +7,76 @@ public class Main {
     public static final char O = 'O';
     public static final char EMPTY = '_';
     public static final int SIDE = 3;
+    public static final int[] funnyCrunch = {2, 1, 0};
 
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
-        scan.useDelimiter(Res.STRING_EMPTY);
+        //scan.useDelimiter(Res.STRING_EMPTY);
+        var init = scan.nextLine();
         var arr = new char[SIDE][SIDE];
-
+        var index = 0;
         for (int i = 0; i < SIDE; i++) {
             for (int j = 0; j < SIDE; j++) {
-                arr[i][j] = scan.next().charAt(0);
+
+                arr[i][j] = init.charAt(index);
+                index++;
             }
         }
 
         printoutArray(arr);
 
-        printOut(getWin(arr, SIDE));
+        int jInput = 0;
+        int iInput = 0;
+        var readingInput = true;
+
+        while (readingInput && scan.hasNext()) {
+            var input = scan.nextLine();
+            var i = input.charAt(0);
+            var j = input.charAt(2);
+            printOut("Read" + i + j);
+            if (!Character.isDigit(i) ||
+                    !Character.isDigit(j)) {
+                printOut(Res.NUM_ONLY_MSG);
+                continue;
+            }
+            iInput = Character.getNumericValue(i);
+            jInput = Character.getNumericValue(j);
+
+            if (iInput < 1 || jInput < 1 ||
+                    iInput > 3 || jInput > 3) {
+                printOut(Res.OUT_OF_RANGE);
+                continue;
+            }
+            iInput--;
+            jInput--;
+
+            int iTr = funnyCrunch[jInput];
+            int jTr = iInput;
+            if (!isVacant(iTr, jTr, arr)) {
+                printOut(Res.OCCUPIED_MSG);
+                continue;
+            }
+            iInput = iTr;
+            jInput = jTr;
+            readingInput = false;
+        }
+        changeWorld(arr, iInput, jInput, X);
+        printoutArray(arr);
+
+        //printOut(getWin(arr, SIDE));
+    }
+
+    public static boolean isVacant(int i, int j, char[][] arr) {
+        printOut("pos " + i + j + "is" + arr[i][j]);
+        return arr[i][j] == EMPTY;
     }
 
     public static String getLine(char p1, char p2, char p3) {
         return String.format(Res.ROW_FORMAT, p1, p2, p3);
+    }
+
+    public static void changeWorld(char[][] arr, int i, int j, char input) {
+        arr[i][j] = input;
     }
 
     public static String getWin(char[][] arr, int side) {
@@ -197,7 +248,9 @@ public class Main {
         private static final String O_WINS_MSG = "O wins";
         private static final String NOT_FINISHED = "Game not finished";
         private static final String DRAW_MSG = "Draw";
-        private static final String STRING_EMPTY = "";
         private static final String ROW_FORMAT = "| %c %c %c |";
+        private static final String NUM_ONLY_MSG = "You should enter numbers!";
+        private static final String OUT_OF_RANGE = "Coordinates should be from 1 to 3!";
+        private static final String OCCUPIED_MSG = "This cell is occupied! Choose another one!";
     }
 }
