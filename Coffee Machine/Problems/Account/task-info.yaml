@@ -5,16 +5,9 @@ files:
   text: // write your class here
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/2984
-status: Failed
+status: Solved
 feedback:
-  message: |
-    Compilation error
-    Main.java:13: error: constructor Account in class Account cannot be applied to given types;
-            Account account = new Account(scanner.nextLong(), scanner.next(), scanner.nextBoolean());
-                              ^
-      required: no arguments
-      found: long,String,boolean
-      reason: actual and formal argument lists differ in length
-    1 error
-  time: Sat, 12 Sep 2020 21:13:33 UTC
+  message: <html>Correct solution<br/><br/>Continue on <a href="https://hyperskill.org/learn/step/2984">JetBrains
+    Academy</a></html>
+  time: Sat, 12 Sep 2020 21:15:20 UTC
 record: -1
