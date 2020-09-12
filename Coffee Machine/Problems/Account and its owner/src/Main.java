@@ -8,7 +8,7 @@ public class Main {
         var acc = new Account("123456", 1000,
                 new User("demo-user", "Alexander", "Schmidt"));
 
-       process(acc);
+        process(acc);
     }
 
     static class Account {
