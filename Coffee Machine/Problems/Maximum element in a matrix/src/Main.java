@@ -10,9 +10,6 @@ class Main {
         var init = false;
         var m = scan.nextInt();
         var n = scan.nextInt();
-        var max = 0;
-        var row = 0;
-        var column = 0;
 
         for (var i = 0; i < m; i++) {
             for (var j = 0; j < n; j++) {
@@ -23,17 +20,10 @@ class Main {
                     max = input;
                 }
 
-                if (max == input) {
-                    if (row > i) {
-                        setMax(input ,i , j);
-                    }
-                    if (row == i && column > j) {
-                        setMax(input ,i , j);
-                    }
-                }
-
-                if (max < input) {
-                    setMax(input ,i , j);
+                if (isNewMax(input) ||
+                        hasSmallerRow(input, i) ||
+                        hasSmallerColumn(input, i, j)) {
+                    setMax(input, i, j);
                 }
             }
         }
@@ -45,5 +35,17 @@ class Main {
         max = input;
         row = i;
         column = j;
+    }
+
+    public static boolean isNewMax(int input) {
+        return max < input;
+    }
+
+    public static boolean hasSmallerRow(int input, int i) {
+        return max == input && row > i;
+    }
+
+    public static boolean hasSmallerColumn(int input, int i, int j) {
+        return max == input && row == i && column > j;
     }
 }
