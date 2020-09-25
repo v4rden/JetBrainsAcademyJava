@@ -5,20 +5,24 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
+        var sourceRadix = scan.nextInt();
         var number = scan.nextInt();
         var radix = scan.nextInt();
         String result = "---";
-        switch (radix) {
-            case 2:
-                result = getBinary(number);
-                break;
-            case 8:
-                result = getOctal(number);
-                break;
-            case 16:
-                result = getHex(number);
-                break;
-        }
+
+        
+
+//        switch (radix) {
+//            case 2:
+//                result = getBinary(number);
+//                break;
+//            case 8:
+//                result = getOctal(number);
+//                break;
+//            case 16:
+//                result = getHex(number);
+//                break;
+//        }
         System.out.println(result);
     }
 
@@ -94,5 +98,29 @@ public class Main {
                 return "f";
         }
         return null;
+    }
+
+    public static String convertToRadix(int dec, int radix) {
+        var sb = new StringBuilder();
+        if (dec < radix) {
+            sb.append(convertSimple(dec, radix));
+        } else {
+            var cur = dec;
+            while (cur > 0) {
+                var r = cur % radix;
+                sb.append(getSimpleHex(r));
+                cur /= radix;
+            }
+        }
+
+        sb.reverse();
+        return sb.toString();
+    }
+
+    public static String convertSimple(int i, int radix) {
+        if (i < radix & i < 10) {
+            return Integer.toString(i);
+        }
+        return Character.toString((char)(i +87));
     }
 }
