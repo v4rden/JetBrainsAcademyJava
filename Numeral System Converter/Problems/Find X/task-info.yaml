@@ -12,10 +12,20 @@ files:
         }
     }
   learner_created: false
-feedback_link: https://hyperskill.org/learn/step/5014
-status: Solved
+feedback_link: https://hyperskill.org/learn/step/2704
+status: Failed
 feedback:
-  message: <html>Correct solution<br/><br/>Continue on <a href="https://hyperskill.org/learn/step/5014">JetBrains
-    Academy</a></html>
-  time: Fri, 25 Sep 2020 18:38:17 UTC
+  message: |
+    Failed test #1 of 5. Wrong answer
+
+    This is a sample test from the problem statement!
+
+    Test input:
+    2 -1 2
+    Correct output:
+    1.5
+
+    Your code output:
+    0.0
+  time: Fri, 25 Sep 2020 18:41:56 UTC
 record: -1
