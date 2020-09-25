@@ -6,11 +6,34 @@ public class Main {
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
         var sourceRadix = scan.nextInt();
-        var number = scan.nextInt();
+        var number = scan.next();
         var radix = scan.nextInt();
         String result = "---";
+        int decimal;
 
-        
+        if (sourceRadix == 1) {
+            var i = 0;
+            var cur = Integer.parseInt(number);
+            while (cur > 0) {
+                cur /= 10;
+                i++;
+            }
+            decimal = i;
+        } else {
+            decimal = Integer.parseInt(number, sourceRadix);
+        }
+
+        if (radix == 1) {
+            var sb = new StringBuilder();
+            for (var i = 0; i < decimal; i++) {
+                sb.append(1);
+            }
+            result = sb.toString();
+        } else {
+            result = convertToRadix(decimal, radix);
+        }
+        System.out.println(result);
+
 
 //        switch (radix) {
 //            case 2:
@@ -108,7 +131,7 @@ public class Main {
             var cur = dec;
             while (cur > 0) {
                 var r = cur % radix;
-                sb.append(getSimpleHex(r));
+                sb.append(convertSimple(r, radix));
                 cur /= radix;
             }
         }
@@ -121,6 +144,6 @@ public class Main {
         if (i < radix & i < 10) {
             return Integer.toString(i);
         }
-        return Character.toString((char)(i +87));
+        return Character.toString((char) (i + 87));
     }
 }
