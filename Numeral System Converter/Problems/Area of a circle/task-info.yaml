@@ -1,0 +1,31 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: |-
+    import java.util.Scanner;
+
+    class Main {
+        public static void main(String[] args) {
+            Scanner scanner = new Scanner(System.in);
+            // put your code here
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/3796
+status: Failed
+feedback:
+  message: |
+    Failed test #1 of 4. Wrong answer
+
+    This is a sample test from the problem statement!
+
+    Test input:
+    100
+    Correct output:
+    31415.926535897932
+
+    Your code output:
+    314.1592653589793
+  time: Sat, 26 Sep 2020 10:57:32 UTC
+record: -1

@@ -13,5 +13,9 @@ files:
     }
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/2703
-status: Unchecked
+status: Solved
+feedback:
+  message: <html>Correct solution<br/><br/>Continue on <a href="https://hyperskill.org/learn/step/2703">JetBrains
+    Academy</a></html>
+  time: Sat, 26 Sep 2020 10:54:32 UTC
 record: -1
