@@ -4,7 +4,7 @@ class Main {
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
         var arr = scan.next().toCharArray();
-        
+
         var isOrdered = true;
         var cur = arr[0];
 
