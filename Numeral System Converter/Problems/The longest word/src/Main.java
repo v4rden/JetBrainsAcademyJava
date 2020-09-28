@@ -6,9 +6,9 @@ class Main {
         scan.useDelimiter(" ");
         String word = "";
 
-        while (scan.hasNext()){
+        while (scan.hasNext()) {
             var input = scan.next();
-            if(word.length() < input.length()){
+            if (word.length() < input.length()) {
                 word = input;
             }
         }
