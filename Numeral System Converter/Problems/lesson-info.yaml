@@ -22,3 +22,4 @@ content:
 - Find the first occurrence of the word "the"
 - Cutting out the middle of a string
 - Convert a date
+- Concat all strings without digits
