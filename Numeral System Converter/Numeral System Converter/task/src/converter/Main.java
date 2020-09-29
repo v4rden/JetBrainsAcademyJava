@@ -8,8 +8,65 @@ public class Main {
         var sourceRadix = scan.nextInt();
         var number = scan.next();
         var radix = scan.nextInt();
-        String result = "---";
+        String result;
+
+        if (number.contains(".")) {
+            var arr = number.split("\\.");
+            int decimal = convertToDecimal(arr[0], sourceRadix);
+
+            result = convertToTarget(decimal, radix);
+            var decimalFrac = convertFractionToDecimal(arr[1], sourceRadix);
+            var frac = convertFractionToTarget(decimalFrac, radix);
+            result += ".";
+            result += frac;
+        } else {
+
+            int decimal = convertToDecimal(number, sourceRadix);
+            result = convertToTarget(decimal, radix);
+        }
+
+
+        System.out.println(result);
+    }
+
+    public static String convertFractionToTarget(String fraction, int radix) {
+        Double d = Double.parseDouble(fraction);
+        if (!fraction.contains(".")) {
+             d = Double.parseDouble("0." + fraction);
+        }
+        var sb = new StringBuilder();
+        double remainder;
+        for (var i = 0; i < 5; i++) {
+            var product = d * radix;
+            var wholePart = (int) product;
+            d = product - wholePart;
+            sb.append(convertSimple(wholePart, radix));
+        }
+        return sb.toString();
+    }
+
+    public static String convertFractionToDecimal(String fraction, int radix) {
+        if (radix == 10) {
+            return fraction;
+        }
+
+        var arr = fraction.toCharArray();
+        double result = 0;
+        for (var i = 0; i < arr.length && i < 5; i++) {
+            double numba = Character.getNumericValue(arr[i]);
+            var div = (Math.pow(radix, i + 1));
+            var division = numba / div;
+            result += division;
+        }
+        return String.valueOf(result);
+    }
+
+    public static int convertToDecimal(String number, int sourceRadix) {
         int decimal;
+
+        if (sourceRadix == 10) {
+            return Integer.parseInt(number);
+        }
 
         if (sourceRadix == 1) {
             var i = 0;
@@ -22,105 +79,22 @@ public class Main {
         } else {
             decimal = Integer.parseInt(number, sourceRadix);
         }
+        return decimal;
+    }
 
-        if (radix == 1) {
+    public static String convertToTarget(int decimal, int targetRadix) {
+        String result;
+        if (decimal == 0) {
+            return "0";
+        }
+        if (targetRadix == 1) {
             var sb = new StringBuilder();
-            for (var i = 0; i < decimal; i++) {
-                sb.append(1);
-            }
+            sb.append("1".repeat(Math.max(0, decimal)));
             result = sb.toString();
         } else {
-            result = convertToRadix(decimal, radix);
+            result = convertToRadix(decimal, targetRadix);
         }
-        System.out.println(result);
-
-
-//        switch (radix) {
-//            case 2:
-//                result = getBinary(number);
-//                break;
-//            case 8:
-//                result = getOctal(number);
-//                break;
-//            case 16:
-//                result = getHex(number);
-//                break;
-//        }
-        System.out.println(result);
-    }
-
-    public static String getBinary(int dec) {
-        var cur = dec;
-        var sb = new StringBuilder();
-        if (cur == 0) {
-            sb.append(0);
-        }
-        while (cur > 0) {
-            var r = cur % 2 == 0 ? 0 : 1;
-            sb.append(r);
-            cur /= 2;
-        }
-        sb.append("b0");
-        sb.reverse();
-        return sb.toString();
-    }
-
-    public static String getOctal(int dec) {
-        var sb = new StringBuilder();
-
-        if (dec < 8) {
-            sb.append(dec);
-        } else {
-
-            var cur = dec;
-
-            while (cur > 0) {
-                var r = cur % 8;
-                sb.append(r);
-                cur /= 8;
-            }
-        }
-        sb.append("0");
-        sb.reverse();
-        return sb.toString();
-    }
-
-    public static String getHex(int dec) {
-        var sb = new StringBuilder();
-        if (dec < 16) {
-            sb.append(getSimpleHex(dec));
-        } else {
-            var cur = dec;
-            while (cur > 0) {
-                var r = cur % 16;
-                sb.append(getSimpleHex(r));
-                cur /= 16;
-            }
-        }
-        sb.append("x0");
-        sb.reverse();
-        return sb.toString();
-    }
-
-    public static String getSimpleHex(int i) {
-        if (i < 10) {
-            return Integer.toString(i);
-        }
-        switch (i) {
-            case 10:
-                return "a";
-            case 11:
-                return "b";
-            case 12:
-                return "c";
-            case 13:
-                return "d";
-            case 14:
-                return "e";
-            case 15:
-                return "f";
-        }
-        return null;
+        return result;
     }
 
     public static String convertToRadix(int dec, int radix) {
@@ -145,5 +119,12 @@ public class Main {
             return Integer.toString(i);
         }
         return Character.toString((char) (i + 87));
+    }
+
+    public static int convertFromSimple(char c) {
+        if (Character.getNumericValue(c) < 10) {
+            return Character.getNumericValue(c);
+        }
+        return c - 87;
     }
 }
