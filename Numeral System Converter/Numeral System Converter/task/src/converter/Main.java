@@ -4,35 +4,41 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        var scan = new Scanner(System.in);
-        var sourceRadix = scan.nextInt();
-        var number = scan.next();
-        var radix = scan.nextInt();
-        String result;
+        try {
+            var scan = new Scanner(System.in);
+            var sourceRadix = scan.nextInt();
+            var number = scan.next();
+            var radix = scan.nextInt();
+            String result;
 
-        if (number.contains(".")) {
-            var arr = number.split("\\.");
-            int decimal = convertToDecimal(arr[0], sourceRadix);
+            checkRadix(sourceRadix);
+            checkRadix(radix);
 
-            result = convertToTarget(decimal, radix);
-            var decimalFrac = convertFractionToDecimal(arr[1], sourceRadix);
-            var frac = convertFractionToTarget(decimalFrac, radix);
-            result += ".";
-            result += frac;
-        } else {
+            if (number.contains(".")) {
+                var arr = number.split("\\.");
+                int decimal = convertToDecimal(arr[0], sourceRadix);
 
-            int decimal = convertToDecimal(number, sourceRadix);
-            result = convertToTarget(decimal, radix);
+                result = convertToTarget(decimal, radix);
+                var decimalFrac = convertFractionToDecimal(arr[1], sourceRadix);
+                var frac = convertFractionToTarget(decimalFrac, radix);
+                result += ".";
+                result += frac;
+            } else {
+                int decimal = convertToDecimal(number, sourceRadix);
+                result = convertToTarget(decimal, radix);
+            }
+
+
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println("error");
         }
-
-
-        System.out.println(result);
     }
 
     public static String convertFractionToTarget(String fraction, int radix) {
         Double d = Double.parseDouble(fraction);
         if (!fraction.contains(".")) {
-             d = Double.parseDouble("0." + fraction);
+            d = Double.parseDouble("0." + fraction);
         }
         var sb = new StringBuilder();
         double remainder;
@@ -79,6 +85,7 @@ public class Main {
         } else {
             decimal = Integer.parseInt(number, sourceRadix);
         }
+        System.out.println("dec:" + decimal);
         return decimal;
     }
 
@@ -126,5 +133,11 @@ public class Main {
             return Character.getNumericValue(c);
         }
         return c - 87;
+    }
+
+    public static void checkRadix(int i) throws Exception {
+        if (i < 1 || i > 36) {
+            throw new Exception("this must be a joke");
+        }
     }
 }
