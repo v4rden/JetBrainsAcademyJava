@@ -36,3 +36,4 @@ content:
 - Avoid division by zero
 - Number of occurrences
 - String to double conversion
+- Catching some exceptions
