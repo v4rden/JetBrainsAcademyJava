@@ -6,9 +6,9 @@
 
 <p>As you know from the previous stage, in order to convert a number from one base to another, first, we need to convert it to decimal if it’s not decimal yet, and only then convert it to another base. The same applies to fractional numbers.</p>
 
-<p>Let’s imagine you have a fractional number <span class="math-tex">\(ab.cdef\)</span> where <span class="math-tex">\(ab\)</span> is the integer part, <span class="math-tex">\(cdef\)</span> is the fractional part, and <span class="math-tex">\(a, b, c, d, e, f\)</span> are some digits or literals, depending on the base of the number.</p>
+<p>Let’s imagine you have a fractional number <span class="math-tex">\(ab.cdef\)</span> where <span class="math-tex">\(ab\)</span> is the integer part, <span class="math-tex">\(cdef\)</span> is the fractional part, and <span class="math-tex">\(a, b, c, d, e, f\)</span> are some digits or letters, depending on the base of the number.</p>
 
-<p>In this case, we have 2 digits (letters) in the integer part and 4 digits (literals) in the fractional part. In other cases, the number of digits (literals) in parts can be different.</p>
+<p>In this case, we have 2 digits (letters) in the integer part and 4 digits (letters) in the fractional part. In other cases, the number of digits (letters) in parts can be different.</p>
 
 <p>To convert the number into decimal, we need to:</p>
 
@@ -18,7 +18,7 @@
 	<li>Convert the fractional part into decimal using the following formula:<span class="math-tex">\[decimalValue = {c \over base^1} + {d \over base^2} + {e \over base^3} + {f \over base^4}\]</span></li>
 </ul>
 
-<p>The more digits (literals) in the fractional part, the more addends in the formula. If the fractional part has letters, then you should use their number representation: ‘a’ – 10, ‘b’ – 11, c – ‘12’, and so on.</p>
+<p>The more digits (letters) in the fractional part, the more addends in the formula. If the fractional part has letters, then you should use their number representation: ‘a’ – 10, ‘b’ – 11, c – ‘12’, and so on.</p>
 
 <p>As a result, you should get a decimal number no greater than 1. If it is greater than 1, you did something wrong.</p>
 
@@ -36,9 +36,9 @@
 
 <p>Multiply the fractional part by the new base: <span class="math-tex">\(0.5168 * 19 = 9.8192\)</span>. The integer part of the result is the first digit (or letter if the integer part is greater than 9) in the fractional part of a number in the new base. In this case, the first digit in the fractional part is <strong>9</strong>.</p>
 
-<p>Take the fractional part from the result of the multiplication and multiply it by the new base again: <span class="math-tex">\(0.8192 * 19 = 15.5648\)</span>. For numbers greater than 9, you should use their literal representation: 10 – ‘a’, 11 – ‘b’, 12 – ‘c’, and so on. In this case, the second digit (literal) is <strong>f</strong> <strong>(15)</strong>.</p>
+<p>Take the fractional part from the result of the multiplication and multiply it by the new base again: <span class="math-tex">\(0.8192 * 19 = 15.5648\)</span>. For numbers greater than 9, you should use their letter representation: 10 – ‘a’, 11 – ‘b’, 12 – ‘c’, and so on. In this case, the second digit (letter) is <strong>f</strong> <strong>(15)</strong>.</p>
 
-<p>To calculate the rest of the digits (literals), repeat this action. In this stage, your program should output only 5 digits (literals) in the fractional part: </p>
+<p>To calculate the rest of the digits (letters), repeat this action. In this stage, your program should output only 5 digits (letters) in the fractional part: </p>
 
 <p><span class="math-tex">\(0.5648 * 19 = 10.7312 \text{ (a)}\\ 0.7312 * 19 = 13.8928 \text{ (d)}\\ 0.8928 * 19 = 16.9632 \text{ (g)}\\\)</span></p>
 
