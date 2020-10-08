@@ -9,5 +9,6 @@ summary: 'Errors are inevitable both in life and in the digital world. Errors oc
 programming_language: Java
 programming_language_version: 11
 content:
+- Error Correcting Encoder-Decoder
 - Problems
 mode: Study
