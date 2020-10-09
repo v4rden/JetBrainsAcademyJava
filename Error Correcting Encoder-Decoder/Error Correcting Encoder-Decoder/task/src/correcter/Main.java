@@ -1,14 +1,36 @@
 package correcter;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         var scan = new Scanner(System.in);
+
         var input = scan.nextLine();
-        System.out.println(simulateErrors(input));
+        System.out.println(input);
+
+        var encoded = encodeTriple(input);
+        System.out.println(encoded);
+
+        var errors = simulateErrors(encoded);
+        System.out.println(errors);
+
+        var decoded = decode(errors);
+        System.out.println(decoded);
+    }
+
+    public static String encodeTriple(String msg) {
+        var arr = msg.toCharArray();
+        var sb = new StringBuilder();
+
+        for (char c : arr) {
+            sb.append(c);
+            sb.append(c);
+            sb.append(c);
+        }
+
+        return sb.toString();
     }
 
     public static String simulateErrors(String string) {
@@ -24,7 +46,29 @@ public class Main {
             left += 3;
             right += 3;
         }
-        var result = new String(arr);
-        return result;
+        return new String(arr);
+    }
+
+    public static String decode(String msg) {
+        var arr = msg.toCharArray();
+        var sb = new StringBuilder();
+
+        var blocks = arr.length / 3;
+        var index = 0;
+        for (var i = 0; i < blocks; i++) {
+            if (arr[index] == arr[index + 1] ||
+                    arr[index] == arr[index + 2]
+            ) {
+                sb.append(arr[index]);
+            } else {
+                sb.append(arr[index + 1]);
+            }
+            index += 3;
+        }
+
+        for (var i = blocks * 3; i < arr.length; i++) {
+            sb.append(arr[i]);
+        }
+        return sb.toString();
     }
 }
