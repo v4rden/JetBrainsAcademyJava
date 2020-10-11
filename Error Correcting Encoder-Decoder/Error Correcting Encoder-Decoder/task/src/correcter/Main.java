@@ -1,23 +1,51 @@
 package correcter;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        var scan = new Scanner(System.in);
+    public static void main(String[] args) throws IOException {
 
-        var input = scan.nextLine();
-        System.out.println(input);
+        var file = readFile();
+        makeErrorPerByte(file);
+        writeToFile(file);
 
-        var encoded = encodeTriple(input);
-        System.out.println(encoded);
+//        var scan = new Scanner(System.in);
+//
+//        var input = scan.nextLine();
+//        System.out.println(input);
+//
+//        var encoded = encodeTriple(input);
+//        System.out.println(encoded);
+//
+//        var errors = simulateErrors(encoded);
+//        System.out.println(errors);
+//
+//        var decoded = decode(errors);
+//        System.out.println(decoded);
+    }
 
-        var errors = simulateErrors(encoded);
-        System.out.println(errors);
+    public static void writeToFile(byte[] arr) throws IOException {
+        var writer = new FileOutputStream("./received.txt");
+        writer.write(arr);
+        writer.close();
+    }
 
-        var decoded = decode(errors);
-        System.out.println(decoded);
+    public static byte[] readFile() throws IOException {
+        File file = new File("./send.txt");
+        byte[] fileContent = Files.readAllBytes(file.toPath());
+        return fileContent;
+    }
+
+    public static void makeErrorPerByte(byte[] arr) {
+        var random = new Random();
+        for (var i = 0; i < arr.length; i++) {
+            var position = random.nextInt(8);
+            arr[i] ^= 1 << position;
+        }
     }
 
     public static String encodeTriple(String msg) {
