@@ -4,98 +4,389 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        var scan = new Scanner(System.in);
+        var input = scan.next();
 
-        var file = readFile();
-        makeErrorPerByte(file);
-        writeToFile(file);
-
-//        var scan = new Scanner(System.in);
-//
-//        var input = scan.nextLine();
-//        System.out.println(input);
-//
-//        var encoded = encodeTriple(input);
-//        System.out.println(encoded);
-//
-//        var errors = simulateErrors(encoded);
-//        System.out.println(errors);
-//
-//        var decoded = decode(errors);
-//        System.out.println(decoded);
+        switch (input) {
+            case "encode":
+                encode();
+                break;
+            case "send":
+                send();
+                break;
+            case "decode":
+                decode();
+                break;
+        }
     }
 
-    public static void writeToFile(byte[] arr) throws IOException {
-        var writer = new FileOutputStream("./received.txt");
+    //
+    public static void decode() throws IOException {
+        var r = readFile(RECEIVED);
+        //var d = makeCodeGreatAgain(r);
+        //writeToFile(d, DECODED);
+    }
+
+    public static void encode() throws IOException {
+        var bytesToEncode = readFile(SEND);
+        var p = new BytePrinter(bytesToEncode);
+        System.out.println(p.getBin());
+        var encoder = new Encoder(bytesToEncode);
+        var result = encoder.get();
+        p = new BytePrinter(result);
+        System.out.println(p.getBin());
+        System.out.println(p.getHex());
+//        var e = encodeCorrectionBytes(f);
+        writeToFile(result, ENCODED);
+    }
+
+    public static void send() throws IOException {
+        var e = readFile(ENCODED);
+//        makeErrorPerByte(e);
+        writeToFile(e, RECEIVED);
+    }
+
+
+    //
+//    public static byte[] makeCodeGreatAgain(byte[] arr) {
+//        if (arr.length % 3 != 0) System.out.println("Now what?");
+//        var res = new byte[arr.length / 3];
+//        var sb = new StringBuilder();
+//
+//        for (var i : arr) {
+//            sb.append(Integer.toBinaryString(i).replace(' ', '0'));
+//        }
+//        var input = sb.toString();
+//        restore(input, res);
+//        return res;
+//    }
+//
+//    public static void restore(String str, byte[] res) {
+//        var sb = new StringBuilder();
+//        int count = 0;
+//        for (var i = 0; i < str.length() / 8; i += 8) {
+//            var currentByte = str.substring(i, i + 8);
+//            if (count < 7) {
+//                var bb = new myByte(currentByte, false);
+//                sb.append(bb.getString());
+//                count++;
+//            } else {
+//                var bb = new myByte(currentByte, true);
+//                sb.append(bb.getString());
+//                count = 0;
+//            }
+//        }
+//        sbToByteArr(sb, res);
+//    }
+//
+//    public static byte[] encodeCorrectionBytes(byte[] arr) {
+//        if (arr.length % 2 != 0) System.out.println("Now what?");
+//        var res = new byte[arr.length * 3];
+//        var sb = new StringBuilder();
+//
+//        for (var i = 0; i < arr.length; i += 2) {
+//
+//            var f = String.format("%8s", Integer.toBinaryString(arr[i]))
+//                    .replace(' ', '0').toCharArray();
+//            var s = String.format("%8s", Integer.toBinaryString(arr[i + 1]))
+//                    .replace(' ', '0').toCharArray();
+//
+//            var fb = new myOtherByte();
+//            fb.setFirst(f);
+//            fb.setSecond(s);
+//            sb.append(fb.getEncodedString());
+//        }
+//
+//        sbToByteArr(sb, res);
+//        return res;
+//    }
+//
+//    public static void sbToByteArr(StringBuilder sb, byte[] arr) {
+//        for (int i = 0, p = 0; i < arr.length; i++, p += 8) {
+//            var sub = sb.substring(p, p + 8);
+//            arr[i] = (byte) Integer.parseInt(sub, 2);
+//        }
+//    }
+//
+//    public static void appendToSb(char[] arr, StringBuilder sb) {
+//        for (var i = 0; i < arr.length; i += 2) {
+//            sb.append(arr[i]);
+//            sb.append(arr[i]);
+//            sb.append(arr[i + 1]);
+//            sb.append(arr[i + 1]);
+//            sb.append(arr[i + 2]);
+//            sb.append(arr[i + 2]);
+//
+//            var check = (charToBool(arr[i]) ^ charToBool(arr[i + 1]) & charToBool(arr[i + 2]))
+//                    ? 1 : 0;
+//            sb.append(check);
+//        }
+//    }
+//
+//    public static boolean charToBool(char c) {
+//        if (c == '1')
+//            return true;
+//        else
+//            return false;
+//    }
+//
+    public static void writeToFile(byte[] arr, String filePath) throws IOException {
+        var writer = new FileOutputStream(filePath);
         writer.write(arr);
         writer.close();
     }
 
-    public static byte[] readFile() throws IOException {
-        File file = new File("./send.txt");
-        byte[] fileContent = Files.readAllBytes(file.toPath());
-        return fileContent;
+    public static byte[] readFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        return Files.readAllBytes(file.toPath());
     }
 
-    public static void makeErrorPerByte(byte[] arr) {
-        var random = new Random();
-        for (var i = 0; i < arr.length; i++) {
-            var position = random.nextInt(8);
-            arr[i] ^= 1 << position;
+    //
+//    public static void makeErrorPerByte(byte[] arr) {
+//        var random = new Random();
+//        for (var i = 0; i < arr.length; i++) {
+//            var position = random.nextInt(8);
+//            arr[i] ^= 1 << position;
+//        }
+//    }
+//
+//
+    public static final String SEND = "./send.txt";
+    public static final String ENCODED = "./encoded.txt";
+    public static final String RECEIVED = "./received.txt";
+    public static final String DECODED = "./decoded.txt";
+//}
+//
+//class myByte {
+//    private final int[] arr;
+//    private final boolean isPadded;
+//
+//    myByte(String str, boolean isPadded) {
+//        arr = new int[8];
+//        this.isPadded = isPadded;
+//        for (var i = 0; i < 8; i++) {
+//            arr[i] = Character.getNumericValue(str.charAt(i));
+//        }
+//        correctSelf();
+//    }
+//
+//    private void correctSelf() {
+//        if (arr[6] != arr[7]) {
+//            return;
+//        }
+//        if (arr[0] != arr[1]) {
+//            arr[0] = arr[7] - arr[5] - arr[3];
+//            arr[1] = arr[7] - arr[5] - arr[3];
+//            return;
+//        }
+//        if (arr[2] != arr[3]) {
+//            arr[2] = arr[7] - arr[5] - arr[1];
+//            arr[3] = arr[7] - arr[5] - arr[1];
+//            return;
+//        }
+//        if (arr[4] != arr[5]) {
+//            arr[4] = arr[7] - arr[3] - arr[1];
+//            arr[5] = arr[7] - arr[3] - arr[1];
+//        }
+//
+//    }
+//
+//    public String getString() {
+//        return (isPadded)
+//                ? String.format("%d", arr[0])
+//                : String.format("%d%d%d", arr[0], arr[2], arr[4]);
+//    }
+//}
+//
+//class myOtherByte {
+//    private final int[] arr;
+//
+//    myOtherByte() {
+//        arr = new int[2 * 8];
+//    }
+//
+//    public void setFirst(char[] arr) {
+//        for (var i = 0; i < arr.length; i++) {
+//            this.arr[i] = Character.getNumericValue(arr[i]);
+//        }
+//    }
+//
+//    public void setSecond(char[] arr) {
+//        for (var i = 8; i < arr.length; i++) {
+//            this.arr[i] = Character.getNumericValue(arr[i]);
+//        }
+//    }
+//
+//    public String getEncodedString() {
+//        var sb = new StringBuilder();
+//        for (var i = 0; i < arr.length; i += 3) {
+//            var check = 0;
+//
+//            sb.append(arr[i]);
+//            sb.append(arr[i]);
+//            if (i + 1 < arr.length) {
+//                sb.append(arr[i + 1]);
+//                sb.append(arr[i + 1]);
+//                sb.append(arr[i + 2]);
+//                sb.append(arr[i + 2]);
+//
+//                check = (intToBool(arr[i]) ^ intToBool(arr[i + 1]) ^ intToBool(arr[i + 2]))
+//                        ? 1 : 0;
+//            } else {
+//                check = arr[i];
+//            }
+//            sb.append(check);
+//            sb.append(check);
+//        }
+//
+//        sb.insert(sb.length() - 2, "0000");
+//        return sb.toString();
+//    }
+//
+//    private static boolean intToBool(int i) {
+//        if (i == 1)
+//            return true;
+//        else
+//            return false;
+//    }
+
+}
+
+class Encoder {
+    private byte[] bytesToEncode;
+    private ArrayList<Byte> encodedbytes;
+
+    public Encoder(byte[] bytes) {
+        if (bytes.length % 2 != 0) {
+            throw new IllegalArgumentException("Encoded Array should be even");
+        }
+        bytesToEncode = bytes;
+        encodedbytes = new ArrayList<>();
+        encode();
+    }
+
+    public byte[] get() {
+        var r = new byte[encodedbytes.size()];
+        for (var i = 0; i < encodedbytes.size(); i++) {
+            r[i] = encodedbytes.get(i);
+        }
+        return r;
+    }
+
+    private void encode() {
+        for (var i = 0; i < bytesToEncode.length; i += 2) {
+            var twoBytes = getTwoBytesForEncoding(i);
+            var edb = new EncodingDoubleByte(twoBytes);
+            var sixEncodedBytes = edb.getEncoded();
+            for (var b : sixEncodedBytes) {
+                encodedbytes.add(b);
+            }
+        }
+        if (bytesToEncode.length * 3 != encodedbytes.size()) {
+            throw new RuntimeException("Should be three times larger");
+        }
+
+    }
+
+    private char[] getTwoBytesForEncoding(int index) {
+        var str = String.format("%8s", Integer.toBinaryString(bytesToEncode[index]))
+                .replace(' ', '0');
+        str += String.format("%8s", Integer.toBinaryString(bytesToEncode[index + 1]))
+                .replace(' ', '0');
+
+        var result = str.toCharArray();
+
+        if (result.length != 16) {
+            throw new ArithmeticException("Resulted string have wrong length");
+        }
+
+        return result;
+    }
+}
+
+class EncodingDoubleByte {
+    private final int[] arr;
+
+    EncodingDoubleByte(char[] in) {
+        arr = new int[in.length];
+
+        for (int i = 0; i < in.length; i++) {
+            arr[i] = Character.getNumericValue(in[i]);
         }
     }
 
-    public static String encodeTriple(String msg) {
-        var arr = msg.toCharArray();
+    public byte[] getEncoded() {
         var sb = new StringBuilder();
 
-        for (char c : arr) {
-            sb.append(c);
-            sb.append(c);
-            sb.append(c);
+        for (int i = 0; i < arr.length; i += 3) {
+            sb.append(arr[i]);
+            sb.append(arr[i]);
+            if (i + 1 < arr.length) {
+                sb.append(arr[i + 1]);
+                sb.append(arr[i + 1]);
+                sb.append(arr[i + 2]);
+                sb.append(arr[i + 2]);
+                sb.append(checkSum(arr[i], arr[+1], arr[i + 2]));
+                sb.append(checkSum(arr[i], arr[+1], arr[i + 2]));
+            } else {
+                sb.append("0000");
+                sb.append(checkSum(arr[i], 0, 0));
+                sb.append(checkSum(arr[i], 0, 0));
+            }
         }
 
+        if (sb.length() != 6 * 8) {
+            throw new RuntimeException("Encoding failed");
+        }
+
+        var sixBytes = new byte[6];
+
+        for (int i = 0, st = 0; i < sixBytes.length; i++, st += 8) {
+            var sub = sb.substring(st, st + 8);
+            var b = (byte) Integer.parseInt(sub, 2);
+            sixBytes[i] = (byte) (b & 0xff);
+        }
+        return sixBytes;
+    }
+
+    public int checkSum(int a, int b, int c) {
+        return a ^ b ^ c;
+    }
+
+}
+
+class BytePrinter {
+    private byte[] arr;
+
+    BytePrinter(byte[] in) {
+        arr = in;
+    }
+
+    public String getBin() {
+        var sb = new StringBuilder();
+        sb.append("bin view: ");
+        for (var b : arr) {
+//            sb.append(String.format("%8s", Integer.toBinaryString((byte) b & 0xff))
+//                    .replace(' ', '0'));
+            sb.append(b);
+            sb.append(" ");
+        }
         return sb.toString();
     }
 
-    public static String simulateErrors(String string) {
-        var arr = string.toCharArray();
-        var random = new Random();
-        var blocks = arr.length / 3;
-        var left = 0;
-        var right = 2;
-        for (var i = 0; i < blocks; i++) {
-            var rIndex = random.nextInt(right - left + 1) + left;
-            var rChar = random.nextInt(122 - 48 + 1) + 48;
-            arr[rIndex] = (char) rChar;
-            left += 3;
-            right += 3;
-        }
-        return new String(arr);
-    }
-
-    public static String decode(String msg) {
-        var arr = msg.toCharArray();
+    public String getHex() {
         var sb = new StringBuilder();
-
-        var blocks = arr.length / 3;
-        var index = 0;
-        for (var i = 0; i < blocks; i++) {
-            if (arr[index] == arr[index + 1] ||
-                    arr[index] == arr[index + 2]
-            ) {
-                sb.append(arr[index]);
-            } else {
-                sb.append(arr[index + 1]);
-            }
-            index += 3;
-        }
-
-        for (var i = blocks * 3; i < arr.length; i++) {
-            sb.append(arr[i]);
+        sb.append("hex view: ");
+        for (byte b : arr) {
+            String st = String.format("%02X", b);
+            sb.append(st);
+            sb.append(" ");
         }
         return sb.toString();
     }
