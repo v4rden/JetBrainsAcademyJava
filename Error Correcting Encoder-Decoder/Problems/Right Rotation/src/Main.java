@@ -25,7 +25,7 @@ class Main {
             var realStep = step - ((step / limit) * limit);
             result = (input + realStep) % limit;
         }
-        
+
         return result;
     }
 }
