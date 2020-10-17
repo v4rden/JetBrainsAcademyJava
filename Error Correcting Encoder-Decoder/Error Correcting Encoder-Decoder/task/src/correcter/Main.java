@@ -37,12 +37,13 @@ public class Main {
         var bytesToEncode = readFile(SEND);
         var p = new BytePrinter(bytesToEncode);
         System.out.println(p.getBin());
+
         var encoder = new Encoder(bytesToEncode);
         var result = encoder.get();
+
         p = new BytePrinter(result);
         System.out.println(p.getBin());
         System.out.println(p.getHex());
-//        var e = encodeCorrectionBytes(f);
         writeToFile(result, ENCODED);
     }
 
@@ -260,6 +261,7 @@ public class Main {
 
 class Encoder {
     private byte[] bytesToEncode;
+    private int[] ints;
     private ArrayList<Byte> encodedbytes;
 
     public Encoder(byte[] bytes) {
@@ -280,33 +282,54 @@ class Encoder {
     }
 
     private void encode() {
-        for (var i = 0; i < bytesToEncode.length; i += 2) {
-            var twoBytes = getTwoBytesForEncoding(i);
-            var edb = new EncodingDoubleByte(twoBytes);
-            var sixEncodedBytes = edb.getEncoded();
-            for (var b : sixEncodedBytes) {
-                encodedbytes.add(b);
+        var sb = new StringBuilder();
+        for (var i = 0; i < bytesToEncode.length; i++) {
+            sb.append(byteToString(bytesToEncode[i]));
+        }
+        var charArray = sb.toString().toCharArray();
+        var intArray = new int[charArray.length];
+        for (var i = 0; i < charArray.length; i++) {
+            intArray[i] = Character.getNumericValue(charArray[i]);
+        }
+
+        sb = new StringBuilder();
+        for (int i = 0; i < intArray.length; i += 3) {
+            sb.append(intArray[i]);
+            sb.append(intArray[i]);
+            if (i + 1 < intArray.length) {
+                sb.append(intArray[i + 1]);
+                sb.append(intArray[i + 1]);
+                sb.append(intArray[i + 2]);
+                sb.append(intArray[i + 2]);
+                sb.append(checkSum(intArray[i], intArray[i + 1], intArray[i + 2]));
+                sb.append(checkSum(intArray[i], intArray[i + 1], intArray[i + 2]));
+            } else {
+                sb.append("0000");
+                sb.append(checkSum(intArray[i], 0, 0));
+                sb.append(checkSum(intArray[i], 0, 0));
             }
         }
+
+        for (var st = 0; st < sb.length(); st += 8) {
+            var sub = sb.substring(st, st + 8);
+            var b = (byte) Integer.parseInt(sub, 2);
+
+            encodedbytes.add((byte) (b & 0xff));
+        }
+
         if (bytesToEncode.length * 3 != encodedbytes.size()) {
-            throw new RuntimeException("Should be three times larger");
+            //throw new RuntimeException("Should be three times larger");
         }
 
     }
 
-    private char[] getTwoBytesForEncoding(int index) {
-        var str = String.format("%8s", Integer.toBinaryString(bytesToEncode[index]))
+    private int checkSum(int a, int b, int c) {
+        return a ^ b ^ c;
+    }
+
+    private String byteToString(byte b) {
+        return String.format("%8s", Integer.toBinaryString(b))
                 .replace(' ', '0');
-        str += String.format("%8s", Integer.toBinaryString(bytesToEncode[index + 1]))
-                .replace(' ', '0');
-
-        var result = str.toCharArray();
-
-        if (result.length != 16) {
-            throw new ArithmeticException("Resulted string have wrong length");
-        }
-
-        return result;
     }
 }
 
@@ -324,22 +347,22 @@ class EncodingDoubleByte {
     public byte[] getEncoded() {
         var sb = new StringBuilder();
 
-        for (int i = 0; i < arr.length; i += 3) {
-            sb.append(arr[i]);
-            sb.append(arr[i]);
-            if (i + 1 < arr.length) {
-                sb.append(arr[i + 1]);
-                sb.append(arr[i + 1]);
-                sb.append(arr[i + 2]);
-                sb.append(arr[i + 2]);
-                sb.append(checkSum(arr[i], arr[+1], arr[i + 2]));
-                sb.append(checkSum(arr[i], arr[+1], arr[i + 2]));
-            } else {
-                sb.append("0000");
-                sb.append(checkSum(arr[i], 0, 0));
-                sb.append(checkSum(arr[i], 0, 0));
-            }
-        }
+//        for (int i = 0; i < arr.length; i += 3) {
+//            sb.append(arr[i]);
+//            sb.append(arr[i]);
+//            if (i + 1 < arr.length) {
+//                sb.append(arr[i + 1]);
+//                sb.append(arr[i + 1]);
+//                sb.append(arr[i + 2]);
+//                sb.append(arr[i + 2]);
+//                sb.append(checkSum(arr[i], arr[i + 1], arr[i + 2]));
+//                sb.append(checkSum(arr[i], arr[i + 1], arr[i + 2]));
+//            } else {
+//                sb.append("0000");
+//                sb.append(checkSum(arr[i], 0, 0));
+//                sb.append(checkSum(arr[i], 0, 0));
+//            }
+//        }
 
         if (sb.length() != 6 * 8) {
             throw new RuntimeException("Encoding failed");
@@ -372,9 +395,9 @@ class BytePrinter {
         var sb = new StringBuilder();
         sb.append("bin view: ");
         for (var b : arr) {
-//            sb.append(String.format("%8s", Integer.toBinaryString((byte) b & 0xff))
-//                    .replace(' ', '0'));
-            sb.append(b);
+            sb.append(String.format("%8s", Integer.toBinaryString((byte) b & 0xff))
+                    .replace(' ', '0'));
+//            sb.append(b);
             sb.append(" ");
         }
         return sb.toString();
