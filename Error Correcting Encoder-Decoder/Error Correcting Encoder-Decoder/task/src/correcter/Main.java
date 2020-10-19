@@ -28,13 +28,12 @@ public class Main {
 
     public static void decode() throws IOException {
         var errorBytes = readFile(RECEIVED);
-        System.out.println("Received length:" + errorBytes.length);
         var p = new BytePrinter(errorBytes);
         System.out.println(p.getBin());
+        System.out.println(p.getHex());
 
         var decoder = new Decoder(errorBytes);
         var result = decoder.get();
-        System.out.println("Decoded length:" + result.length);
 
         p = new BytePrinter(result);
         System.out.println(p.getBin());
@@ -46,6 +45,7 @@ public class Main {
         var bytesToEncode = readFile(SEND);
         var p = new BytePrinter(bytesToEncode);
         System.out.println(p.getBin());
+        System.out.println(p.getHex());
 
         var encoder = new Encoder(bytesToEncode);
         var result = encoder.get();
@@ -58,10 +58,18 @@ public class Main {
 
     public static void send() throws IOException {
         var encodedBytes = readFile(ENCODED);
+        var p = new BytePrinter(encodedBytes);
+        System.out.println(p.getBin());
+        System.out.println(p.getHex());
 
-        makeErrorPerByte(encodedBytes);
+        //makeErrorPerByte(encodedBytes);
+        var sender = new Sender(encodedBytes);
+        var errors = sender.get();
 
-        writeToFile(encodedBytes, RECEIVED);
+        p = new BytePrinter(errors);
+        System.out.println(p.getBin());
+        System.out.println(p.getHex());
+        writeToFile(errors, RECEIVED);
     }
 
     public static void writeToFile(byte[] arr, String filePath) throws IOException {
@@ -115,7 +123,7 @@ class Encoder {
         var sb = new StringBuilder();
 
         for (byte value : bytesToEncode) {
-            sb.append(byteToString(value));
+            sb.append(Helper.byteToString(value));
         }
         var charArray = sb.toString().toCharArray();
         var intArray = new int[charArray.length];
@@ -125,17 +133,20 @@ class Encoder {
 
         sb = new StringBuilder();
         for (int i = 0; i < intArray.length; i += 4) {
-            sb.append(intArray[i] ^ intArray[i + 1] ^ intArray[i + 3]);
-            sb.append(intArray[i] ^ intArray[i + 2] ^ intArray[i + 3]);
+            var first = intArray[i];
+            var second = intArray[i + 1];
+            var third = intArray[i + 2];
+            var forth = intArray[i + 3];
 
-            sb.append(intArray[i]);
-            sb.append(intArray[i + 1] ^ intArray[i + 2] ^ intArray[i + 3]);
+            sb.append(first ^ second ^ forth);  //0
+            sb.append(first ^ third ^ forth);   //1
+            sb.append(first);                   //2
+            sb.append(second ^ third ^ forth);  //3
 
-            sb.append(intArray[i + 1]);
-            sb.append(intArray[i + 2]);
-
-            sb.append(intArray[i + 3]);
-            sb.append("0");
+            sb.append(second);                  //4
+            sb.append(third);                   //5
+            sb.append(forth);                   //6
+            sb.append("0");                     //7
         }
 
         for (var st = 0; st < sb.length(); st += 8) {
@@ -144,11 +155,6 @@ class Encoder {
 
             encodedBytes.add((byte) (b & 0xff));
         }
-    }
-
-    private String byteToString(byte b) {
-        return String.format("%8s", Integer.toBinaryString(b))
-                .replace(' ', '0');
     }
 }
 
@@ -174,7 +180,7 @@ class Decoder {
         var sb = new StringBuilder();
 
         for (byte value : bytesToDecode) {
-            sb.append(byteToString(value));
+            sb.append(Helper.byteToString(value));
         }
 
         var charArray = sb.toString().toCharArray();
@@ -186,33 +192,95 @@ class Decoder {
         sb = new StringBuilder();
 
         for (var i = 0; i < intArray.length; i += 8) {
-            var p1IsCorrect = (intArray[i + 2] ^ intArray[i + 4] ^ intArray[i + 6]) == intArray[i];
-            var p2IsCorrect = (intArray[i + 2] ^ intArray[i + 5] ^ intArray[i + 6]) == intArray[i];
-            var p4IsCorrect = (intArray[i + 4] ^ intArray[i + 5] ^ intArray[i + 6]) == intArray[i];
+            int zeroParity = intArray[i];
+            int oneParity = intArray[i + 1];
+            int twoV = intArray[i + 2];
+            int threeParity = intArray[i + 3];
+            int fourV = intArray[i + 4];
+            int fiveV = intArray[i + 5];
+            int sixV = intArray[i + 6];
+            int sevenV = intArray[i + 7];  //not used
 
-            intArray[i + 2] = (!p1IsCorrect && !p2IsCorrect && p4IsCorrect) ? Math.abs(intArray[i + 2] - 1) : intArray[i + 2];
-            intArray[i + 4] = (!p1IsCorrect && p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 4] - 1) : intArray[i + 4];
-            intArray[i + 5] = (p1IsCorrect && !p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 5] - 1) : intArray[i + 5];
-            intArray[i + 6] = (!p1IsCorrect && !p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 6] - 1) : intArray[i + 6];
+            var p1IsCorrect = (twoV ^ fourV ^ sixV) == zeroParity;
+            var p2IsCorrect = (twoV ^ fiveV ^ sixV) == oneParity;
+            var p4IsCorrect = (fourV ^ fiveV ^ sixV) == threeParity;
 
-            sb.append(intArray[i + 2]);
-            sb.append(intArray[i + 4]);
-            sb.append(intArray[i + 5]);
-            sb.append(intArray[i + 6]);
+            var needToCorrectFirstBit = !p1IsCorrect && !p2IsCorrect && p4IsCorrect;
+            var needToCorrectSecondBit = !p1IsCorrect && p2IsCorrect && !p4IsCorrect;
+            var needToCorrectThirdBit = p1IsCorrect && !p2IsCorrect && !p4IsCorrect;
+            var needToCorrectForthBit = !p1IsCorrect && !p2IsCorrect && !p4IsCorrect;
+
+            twoV = (needToCorrectFirstBit) ? Math.abs(intArray[i + 2] - 1) : intArray[i + 2];
+            fourV = (needToCorrectSecondBit) ? Math.abs(intArray[i + 4] - 1) : intArray[i + 4];
+            fiveV = (needToCorrectThirdBit) ? Math.abs(intArray[i + 5] - 1) : intArray[i + 5];
+            sixV = (needToCorrectForthBit) ? Math.abs(intArray[i + 6] - 1) : intArray[i + 6];
+
+            sb.append(twoV);
+            sb.append(fourV);
+            sb.append(fiveV);
+            sb.append(sixV);
         }
 
         for (var st = 0; st < sb.length(); st += 8) {
             var sub = sb.substring(st, st + 8);
             var b = (byte) Integer.parseInt(sub, 2);
 
-            decodedBytes.add((byte) (b & 0xff));
+            decodedBytes.add(b);
+            //decodedBytes.add((byte) (b & 0xff));
         }
     }
+}
 
-    private String byteToString(byte b) {
-        var result = String.format("%8s", Integer.toBinaryString((byte) (b & 0xf)))
-                .replace(' ', '0');
-        return result;
+class Sender {
+    private final byte[] bytesToEncode;
+    private final ArrayList<Byte> encodedBytes;
+
+    public Sender(byte[] bytes) {
+        bytesToEncode = bytes;
+        encodedBytes = new ArrayList<>();
+        encode();
+    }
+
+    public byte[] get() {
+        var r = new byte[encodedBytes.size()];
+        for (var i = 0; i < encodedBytes.size(); i++) {
+            r[i] = encodedBytes.get(i);
+        }
+        return r;
+    }
+
+    private void encode() {
+        var sb = new StringBuilder();
+
+        for (byte value : bytesToEncode) {
+            sb.append(Helper.byteToString(value));
+        }
+        var charArray = sb.toString().toCharArray();
+        var intArray = new int[charArray.length];
+        for (var i = 0; i < charArray.length; i++) {
+            intArray[i] = Character.getNumericValue(charArray[i]);
+        }
+        var random = new Random();
+        sb = new StringBuilder();
+        for (int i = 0; i < intArray.length; i += 8) {
+            var r = random.nextInt(8);
+            var index = 0;
+            for (var j = i; j < i + 8; j++) {
+                if (index == r) {
+                    sb.append(intArray[j] == 0 ? 1 : 0);
+                } else {
+                    sb.append(intArray[j]);
+                }
+                index++;
+            }
+        }
+
+        for (var st = 0; st < sb.length(); st += 8) {
+            var sub = sb.substring(st, st + 8);
+            var b = (byte) Integer.parseInt(sub, 2);
+
+            encodedBytes.add((byte) (b & 0xff));
+        }
     }
 }
 
@@ -227,8 +295,8 @@ class BytePrinter {
         var sb = new StringBuilder();
         sb.append("bin view: ");
         for (var b : arr) {
-            sb.append(String.format("%8s", Integer.toBinaryString((byte) (b & 0xf)))
-                    .replace(' ', '0'));
+            var unsign = (byte) (b & 0xf);
+            sb.append(Helper.byteToString(unsign));
             sb.append(" ");
         }
         return sb.toString();
@@ -243,5 +311,15 @@ class BytePrinter {
             sb.append(" ");
         }
         return sb.toString();
+    }
+}
+
+class Helper {
+    public static String byteToString(byte input) {
+
+        var formatted = String.format("%8s", Integer.toBinaryString(input & 0xff))
+                .replace(' ', '0');
+
+        return formatted;
     }
 }
