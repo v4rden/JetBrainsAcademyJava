@@ -349,6 +349,39 @@ files:
     }
 
   learner_created: false
+- name: decoded.txt
+  visible: true
+  text: Eat more of these french buns!
+  learner_created: true
+- name: encoded.txt
+  visible: true
+  text: "3\x0f3�\0���\x0f\0\0�����<���3��\0<<��<\0�\0<�\0��\x0f��<���3��\0<\x0f��\x0f\
+    \x0f��<<��\x0f��\0\x0f\0\0�\x0f\x0f��<<��\x0f��\x0f"
+  learner_created: true
+- name: received.txt
+  visible: true
+  text: "\x13\n7�\x10���O@\x10��L��=���2C�\x10>|�\x1c\x10C\x02�� �\x8f�ͼ�ళ�ˀ|\nC�\x0e\
+    \x0e��\x1c=ǰ\vL�@�  �/\x1f�μ|ǿ/��\x1f"
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/58/stages/316/implement
-status: Unchecked
+status: Failed
+feedback:
+  message: "Wrong answer in test #3\n\nThe decoded text must match initial text!\n\
+    \nPlease find below the output of your program during this failed test.\nNote\
+    \ that the &#39;&gt;&#39; character indicates the beginning of the input line.\n\
+    \n---\n\n&gt; decode\nReceived length:60\nbin view: 00001100 00001110 00001000\
+    \ 00000010 00001100 00001000 00000100 00000000 00001000 00001011 00001000 00001100\
+    \ 00001110 00000110 00001110 00001010 00001100 00000010 00001100 00001110 00000100\
+    \ 00001110 00001100 00000000 00001110 00001100 00001100 00001000 00001100 00001011\
+    \ 00001110 00000110 00001100 00001011 00001100 00000000 00001000 00001101 00001110\
+    \ 00000000 00000100 00001010 00001100 00001100 00001100 00000100 00001110 00000010\
+    \ 00000101 00001000 00001100 00000100 00001100 00001000 00001100 00001000 00001110\
+    \ 00000110 00000101 00000110 \nBytes to decode60\nhere lenght480\nchar arr length:480\n\
+    intArray480\nsb length: 240\ndecoded bytest:30\nDecoded length:30\nbin view: 00000111\
+    \ 00000000 00000000 00000000 00000101 00001110 00000011 00000101 00000000 00000111\
+    \ 00000111 00000000 00001110 00000000 00000101 00000011 00000101 00000000 00001110\
+    \ 00000000 00000101 00001110 00000000 00000000 00000000 00000000 00000000 00000000\
+    \ 00000011 00000011 \nhex view: E7 00 E0 00 05 0E 73 75 E0 E7 07 E0 7E E0 E5 73\
+    \ E5 E0 0E 70 05 EE E0 70 00 E0 E0 E0 73 03"
+  time: Mon, 19 Oct 2020 12:37:13 UTC
 record: -1

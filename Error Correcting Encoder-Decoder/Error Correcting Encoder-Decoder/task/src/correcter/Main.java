@@ -1,9 +1,9 @@
 package correcter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -28,11 +28,13 @@ public class Main {
 
     public static void decode() throws IOException {
         var errorBytes = readFile(RECEIVED);
+        System.out.println("Received length:" + errorBytes.length);
         var p = new BytePrinter(errorBytes);
         System.out.println(p.getBin());
 
         var decoder = new Decoder(errorBytes);
         var result = decoder.get();
+        System.out.println("Decoded length:" + result.length);
 
         p = new BytePrinter(result);
         System.out.println(p.getBin());
@@ -70,7 +72,10 @@ public class Main {
 
     public static byte[] readFile(String filePath) throws IOException {
         File file = new File(filePath);
-        return Files.readAllBytes(file.toPath());
+        var reader = new FileInputStream(file);
+        byte[] content = new byte[(int) file.length()];
+        reader.read(content, 0, (int) file.length());
+        return content;
     }
 
     public static void makeErrorPerByte(byte[] arr) {
@@ -89,13 +94,10 @@ public class Main {
 }
 
 class Encoder {
-    private byte[] bytesToEncode;
+    private final byte[] bytesToEncode;
     private final ArrayList<Byte> encodedBytes;
 
     public Encoder(byte[] bytes) {
-        if (bytes.length % 2 != 0) {
-            //throw new IllegalArgumentException("Encoded Array should be even");
-        }
         bytesToEncode = bytes;
         encodedBytes = new ArrayList<>();
         encode();
@@ -111,8 +113,9 @@ class Encoder {
 
     private void encode() {
         var sb = new StringBuilder();
-        for (var i = 0; i < bytesToEncode.length; i++) {
-            sb.append(byteToString(bytesToEncode[i]));
+
+        for (byte value : bytesToEncode) {
+            sb.append(byteToString(value));
         }
         var charArray = sb.toString().toCharArray();
         var intArray = new int[charArray.length];
@@ -121,21 +124,18 @@ class Encoder {
         }
 
         sb = new StringBuilder();
-        for (int i = 0; i < intArray.length; i += 3) {
+        for (int i = 0; i < intArray.length; i += 4) {
+            sb.append(intArray[i] ^ intArray[i + 1] ^ intArray[i + 3]);
+            sb.append(intArray[i] ^ intArray[i + 2] ^ intArray[i + 3]);
+
             sb.append(intArray[i]);
-            sb.append(intArray[i]);
-            if (i + 1 < intArray.length) {
-                sb.append(intArray[i + 1]);
-                sb.append(intArray[i + 1]);
-                sb.append(intArray[i + 2]);
-                sb.append(intArray[i + 2]);
-                sb.append(checkSum(intArray[i], intArray[i + 1], intArray[i + 2]));
-                sb.append(checkSum(intArray[i], intArray[i + 1], intArray[i + 2]));
-            } else {
-                sb.append("0000");
-                sb.append(checkSum(intArray[i], 0, 0));
-                sb.append(checkSum(intArray[i], 0, 0));
-            }
+            sb.append(intArray[i + 1] ^ intArray[i + 2] ^ intArray[i + 3]);
+
+            sb.append(intArray[i + 1]);
+            sb.append(intArray[i + 2]);
+
+            sb.append(intArray[i + 3]);
+            sb.append("0");
         }
 
         for (var st = 0; st < sb.length(); st += 8) {
@@ -144,15 +144,6 @@ class Encoder {
 
             encodedBytes.add((byte) (b & 0xff));
         }
-
-        if (bytesToEncode.length * 3 != encodedBytes.size()) {
-            //throw new RuntimeException("Should be three times larger");
-        }
-
-    }
-
-    private int checkSum(int a, int b, int c) {
-        return a ^ b ^ c;
     }
 
     private String byteToString(byte b) {
@@ -162,7 +153,7 @@ class Encoder {
 }
 
 class Decoder {
-    private byte[] bytesToDecode;
+    private final byte[] bytesToDecode;
     private final ArrayList<Byte> decodedBytes;
 
     public Decoder(byte[] bytes) {
@@ -181,9 +172,11 @@ class Decoder {
 
     private void decode() {
         var sb = new StringBuilder();
-        for (var i = 0; i < bytesToDecode.length; i++) {
-            sb.append(byteToString(bytesToDecode[i]));
+
+        for (byte value : bytesToDecode) {
+            sb.append(byteToString(value));
         }
+
         var charArray = sb.toString().toCharArray();
         var intArray = new int[charArray.length];
         for (var i = 0; i < charArray.length; i++) {
@@ -193,38 +186,20 @@ class Decoder {
         sb = new StringBuilder();
 
         for (var i = 0; i < intArray.length; i += 8) {
-            if (i + 1 == intArray.length) {
-                if (intArray[6 + i] != intArray[7 + i]) {
-                    sb.append(intArray[0 + i]);
-                } else {
-                    sb.append(intArray[7 + i]);
-                }
-                continue;
-            }
+            var p1IsCorrect = (intArray[i + 2] ^ intArray[i + 4] ^ intArray[i + 6]) == intArray[i];
+            var p2IsCorrect = (intArray[i + 2] ^ intArray[i + 5] ^ intArray[i + 6]) == intArray[i];
+            var p4IsCorrect = (intArray[i + 4] ^ intArray[i + 5] ^ intArray[i + 6]) == intArray[i];
 
+            intArray[i + 2] = (!p1IsCorrect && !p2IsCorrect && p4IsCorrect) ? Math.abs(intArray[i + 2] - 1) : intArray[i + 2];
+            intArray[i + 4] = (!p1IsCorrect && p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 4] - 1) : intArray[i + 4];
+            intArray[i + 5] = (p1IsCorrect && !p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 5] - 1) : intArray[i + 5];
+            intArray[i + 6] = (!p1IsCorrect && !p2IsCorrect && !p4IsCorrect) ? Math.abs(intArray[i + 6] - 1) : intArray[i + 6];
 
-            if (intArray[6 + i] != intArray[7 + i]) {
-                sb.append(intArray[0 + i]);
-                sb.append(intArray[2 + i]);
-                sb.append(intArray[4 + i]);
-            }
-            if (intArray[0 + i] != intArray[1 + i]) {
-                sb.append(calculateFromChecksum(intArray[6 + i], intArray[2 + i], intArray[4 + i]));
-                sb.append(intArray[2 + i]);
-                sb.append(intArray[4 + i]);
-            }
-            if (intArray[2 + i] != intArray[3 + i]) {
-                sb.append(intArray[0 + i]);
-                sb.append(calculateFromChecksum(intArray[6 + i], intArray[0 + i], intArray[4 + i]));
-                sb.append(intArray[4 + i]);
-            }
-            if (intArray[4 + i] != intArray[5 + i]) {
-                sb.append(intArray[0 + i]);
-                sb.append(intArray[2 + i]);
-                sb.append(calculateFromChecksum(intArray[6 + i], intArray[0 + i], intArray[2 + i]));
-            }
+            sb.append(intArray[i + 2]);
+            sb.append(intArray[i + 4]);
+            sb.append(intArray[i + 5]);
+            sb.append(intArray[i + 6]);
         }
-
 
         for (var st = 0; st < sb.length(); st += 8) {
             var sub = sb.substring(st, st + 8);
@@ -234,18 +209,15 @@ class Decoder {
         }
     }
 
-    private int calculateFromChecksum(int sum, int a, int b) {
-        return sum ^ a ^ b;
-    }
-
     private String byteToString(byte b) {
-        return String.format("%8s", Integer.toBinaryString(b))
+        var result = String.format("%8s", Integer.toBinaryString((byte) (b & 0xf)))
                 .replace(' ', '0');
+        return result;
     }
 }
 
 class BytePrinter {
-    private byte[] arr;
+    private final byte[] arr;
 
     BytePrinter(byte[] in) {
         arr = in;
@@ -255,7 +227,7 @@ class BytePrinter {
         var sb = new StringBuilder();
         sb.append("bin view: ");
         for (var b : arr) {
-            sb.append(String.format("%8s", Integer.toBinaryString((byte) b & 0xff))
+            sb.append(String.format("%8s", Integer.toBinaryString((byte) (b & 0xf)))
                     .replace(' ', '0'));
             sb.append(" ");
         }

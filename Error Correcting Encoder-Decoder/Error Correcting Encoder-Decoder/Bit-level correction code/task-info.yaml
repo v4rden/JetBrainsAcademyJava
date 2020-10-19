@@ -363,12 +363,12 @@ feedback_link: https://hyperskill.org/projects/58/stages/315/implement
 status: Failed
 feedback:
   message: "Exception in test #4\n\njava.lang.ArrayIndexOutOfBoundsException: Index\
-    \ 152 out of bounds for length 152\n\tat correcter.Encoder.encode(Main.java:255)\n\
-    \tat correcter.Encoder.&lt;init&gt;(Main.java:226)\n\tat correcter.Main.encode(Main.java:48)\n\
+    \ 152 out of bounds for length 152\n\tat correcter.Encoder.encode(Main.java:130)\n\
+    \tat correcter.Encoder.&lt;init&gt;(Main.java:101)\n\tat correcter.Main.encode(Main.java:48)\n\
     \tat correcter.Main.main(Main.java:18)\n\nPlease find below the output of your\
     \ program during this failed test.\nNote that the &#39;&gt;&#39; character indicates\
     \ the beginning of the input line.\n\n---\n\n&gt; encode\nbin view: 00100100 01101111\
     \ 01101101 01100101 00100000 01110010 01100001 01101110 01100100 00110000 01101101\
     \ 00100000 01101101 01100101 01110011 01110011 01000001 01100111 01100101"
-  time: Sat, 17 Oct 2020 16:23:37 UTC
-record: -1
+  time: Sat, 17 Oct 2020 16:52:48 UTC
+record: 4
