@@ -16,3 +16,8 @@ content:
 - Basic calculator
 - Advanced calculator
 - Create a full name
+- Calculator with four methods
+- Throw an IOException
+- Throw an unchecked exception
+- Throw a checked exception
+- Return empty string when argument is null
