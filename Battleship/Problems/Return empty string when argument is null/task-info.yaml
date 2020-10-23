@@ -23,5 +23,9 @@ files:
     }
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/1947
-status: Unchecked
+status: Solved
+feedback:
+  message: <html>Correct solution<br/><br/>Continue on <a href="https://hyperskill.org/learn/step/1947">JetBrains
+    Academy</a></html>
+  time: Fri, 23 Oct 2020 17:34:31 UTC
 record: -1
