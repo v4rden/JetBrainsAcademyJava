@@ -21,3 +21,5 @@ content:
 - Throw an unchecked exception
 - Throw a checked exception
 - Return empty string when argument is null
+- Avoid NPE
+- Out of bounds!
