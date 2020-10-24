@@ -1,0 +1,42 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: |-
+    import java.util.Scanner;
+
+    public class Main {
+
+        public static int getNumberOfMaxParam(int a, int b, int c) {
+            // write a body here
+        }
+
+        public static void main(String[] args) {
+
+            Scanner scanner = new Scanner(System.in);
+
+            final int a = scanner.nextInt();
+            final int b = scanner.nextInt();
+            final int c = scanner.nextInt();
+
+            System.out.println(getNumberOfMaxParam(a, b, c));
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/10992
+status: Failed
+feedback:
+  message: |
+    Failed test #1 of 11. Wrong answer
+
+    This is a sample test from the problem statement!
+
+    Test input:
+    12 3 12
+    Correct output:
+    1
+
+    Your code output:
+    3
+  time: Sat, 24 Oct 2020 06:36:45 UTC
+record: -1
